@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Birthday ❤️</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Great+Vibes&display=swap');
+
+*{ box-sizing:border-box; margin:0; padding:0; }
+html,body{ width:100%; height:100%; }
+
+body{
+    background:#05030c;
+    color:white;
+    font-family:'Cormorant Garamond',serif;
+    overflow:hidden;
+    user-select:none;
+    -webkit-user-select:none;
+}
+
+button{ font-family:inherit; }
+
+#background{
+    position:fixed;
+    inset:0;
+    z-index:-10;
+    background: radial-gradient(circle at 50% 25%,#25103f 0%,#0b0618 42%,#030208 100%);
+}
+
+.star{
+    position:absolute;
+    width:2px; height:2px;
+    background:white;
+    border-radius:50%;
+    animation:twinkle 3s infinite alternate;
+}
+
+@keyframes twinkle{
+    from{opacity:.15;transform:scale(.6)}
+    to{opacity:1;transform:scale(1.4)}
+}
+
+#musicToggle{
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 999;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(10px);
+    color: #ffd6f7;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: 0 0 15px rgba(170, 70, 255, 0.2);
+    transition: 0.3s;
+}
+#musicToggle:hover{ background: rgba(255, 75, 210, 0.25); transform: scale(1.05); }
+
+.screen{
+    position:fixed; inset:0;
+    display:flex; align-items:center; justify-content:center;
+    text-align:center; padding:25px;
+    transition:opacity 1s,transform 1s;
+}
+
+.hidden{
+    opacity:0!important;
+    pointer-events:none!important;
+    transform:scale(1.04);
+}
+
+.glass{
+    width:min(850px,94vw);
+    padding:40px 30px;
+    border-radius:30px;
+    background:rgba(255,255,255,.065);
+    border:1px solid rgba(255,255,255,.15);
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+    box-shadow: 0 0 70px rgba(170,70,255,.15), inset 0 0 30px rgba(255,255,255,.025);
+}
+
+.btn{
+    margin-top:25px; border:none; border-radius:30px;
+    padding:14px 30px; color:white; font-size:18px; cursor:pointer;
+    background:linear-gradient(135deg,#b52cff,#ff45b7);
+    box-shadow:0 0 30px rgba(225,65,255,.35); transition:.3s;
+}
+
+.btn:hover{ transform:scale(1.07); box-shadow:0 0 45px rgba(255,75,210,.7); }
+.btn:disabled{ opacity:0.5; cursor:not-allowed; transform:none!important; box-shadow:none!important; }
+
+#passwordScreen{ z-index:100; flex-direction:column; }
+.passwordSmall{ text-transform:uppercase; letter-spacing:5px; opacity:.6; margin-bottom:15px; }
+.passwordTitle{ font-family:'Great Vibes',cursive; font-size:76px; color:#ffd6f7; text-shadow:0 0 40px #bb3cff; margin-bottom:30px; }
+#password{ width:270px; padding:15px 20px; border-radius:30px; border:1px solid rgba(255,255,255,.2); outline:none; background:rgba(255,255,255,.08); color:white; text-align:center; font-size:18px; }
+#error{ color:#ff8ebd; min-height:25px; margin-top:8px; }
+
+#audioGateScreen{ z-index:90; flex-direction:column; background:rgba(5,3,12,0.92); }
+
+#fireworksCanvas{ position:fixed; inset:0; z-index:50; pointer-events:none; }
+#explosionFlash{ position:fixed; inset:0; z-index:55; pointer-events:none; opacity:0; background: radial-gradient(circle at 50% 45%, rgba(255,255,255,1) 0%, rgba(255,100,230,.85) 15%, rgba(170,50,255,.55) 35%, rgba(40,180,255,.25) 60%, transparent 80%); mix-blend-mode:screen; }
+#explosionFlash.flash{ animation:screenExplosionFlash 1.25s ease-out forwards; }
+
+@keyframes screenExplosionFlash{
+    0%{ opacity:0; transform:scale(.5); }
+    12%{ opacity:1; transform:scale(1.05); }
+    100%{ opacity:0; transform:scale(1.2); }
+}
+
+#birthdayScreen{ z-index:60; opacity:0; pointer-events:none; }
+#birthdayScreen.active{ opacity:1; pointer-events:auto; }
+.rocket{ position:absolute; bottom:-100px; left:50%; width:6px; height:90px; border-radius:50%; background:linear-gradient(to top,#ff3000,#ffd900,#fff); box-shadow:0 0 10px #ff5400, 0 0 25px #ffbb00; transform:translateX(-50%); }
+@keyframes rocketUp{ from{ transform:translate(-50%,0); } to{ transform:translate(-50%,-75vh); } }
+.birthdayReveal{ opacity:0; transform:scale(.3); }
+.birthdayReveal.show{ animation:birthdayIn 2s cubic-bezier(.2,.8,.2,1) forwards; }
+@keyframes birthdayIn{ 0%{ opacity:0; transform:scale(.3); } 60%{ opacity:1; transform:scale(1.13); } 100%{ opacity:1; transform:scale(1); } }
+.happyText{ font-family:'Great Vibes',cursive; font-size:105px; line-height:1; color:#fff; text-shadow:0 0 10px #fff, 0 0 25px #ff5cdb, 0 0 55px #b62cff; }
+.dearText{ font-family:'Great Vibes',cursive; font-size:72px; margin-top:15px; color:#ffd4f4; text-shadow:0 0 15px #ff77e5; }
+.heartBeat{ font-size:45px; margin-top:20px; animation:heart 1s infinite; }
+@keyframes heart{ 50%{transform:scale(1.3)} }
+
+.chapterNumber{ text-transform:uppercase; letter-spacing:5px; color:#cda5ff; opacity:.8; }
+.chapterTitle{ font-family:'Great Vibes',cursive; font-size:65px; color:#ffd6f5; margin:15px; }
+.chapterText{ font-size:24px; line-height:1.6; max-width:680px; margin:auto; }
+.memoryCard{ min-height:300px; display:flex; align-items:center; justify-content:center; flex-direction:column; }
+.memoryIcon{ font-size:60px; margin-bottom:20px; }
+.memoryTitle{ font-family:'Great Vibes',cursive; font-size:55px; color:#ffd3f5; }
+.memoryText{ font-size:23px; max-width:600px; line-height:1.5; margin-top:20px; }
+
+.quizCounter{ color:#d5a6ff; letter-spacing:3px; }
+.question{ font-family:'Great Vibes',cursive; font-size:52px; color:#ffd8f6; margin:20px auto; max-width:700px; }
+.answers{ display:grid; grid-template-columns:1fr 1fr; gap:15px; max-width:600px; margin:auto; }
+.answer{ padding:15px; border-radius:18px; border:1px solid rgba(255,255,255,.15); background:rgba(255,255,255,.07); color:white; font-size:19px; cursor:pointer; transition:.3s; }
+.answer:hover{ background:rgba(200,70,255,.2); transform:translateY(-3px); }
+.answer.correct{ background:rgba(50,220,130,.25); border-color:#5cffb0; }
+.answer.wrong{ background:rgba(255,50,100,.25); border-color:#ff7194; }
+
+.cake{ width:240px; height:130px; margin:50px auto 30px; position:relative; }
+.cakeBase{ position:absolute; bottom:0; width:240px; height:100px; border-radius:20px 20px 30px 30px; background:linear-gradient(#ff8acb,#cc3c8e); }
+.cakeCream{ position:absolute; top:15px; left:0; width:240px; height:40px; border-radius:20px; background:#fff1fb; }
+.candle{ position:absolute; width:15px; height:55px; background:#fff; top:-40px; border-radius:5px; }
+.candle:nth-child(1){left:65px} .candle:nth-child(2){left:112px} .candle:nth-child(3){left:159px}
+.flame{ position:absolute; width:16px; height:23px; background:#ffd000; border-radius:50%; top:-22px; left:0; box-shadow:0 0 15px #ff8700; animation:flame .35s infinite alternate; }
+@keyframes flame{ to{ transform:scale(.8) translateY(2px); } }
+
+.photoBox{ width:min(450px,85vw); height:500px; margin:25px auto; position:relative; overflow:hidden; border-radius:25px; background:linear-gradient(135deg,#30164d,#10071c); touch-action:none; }
+.photoContent{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
+.photoContent img{ width:100%; height:100%; object-fit:cover; }
+#scratchCanvas{ position:absolute; inset:0; width:100%; height:100%; cursor:crosshair; z-index:2; }
+.scratchHint{ font-size:20px; color:#dcbaff; margin-top:10px; }
+
+.envelope{ font-size:100px; cursor:pointer; animation:float 2s infinite ease-in-out; }
+@keyframes float{ 50%{transform:translateY(-10px)} }
+.letter{ display:none; max-width:700px; text-align:left; padding:35px; border-radius:20px; background:#fff9fc; color:#391f36; box-shadow:0 0 60px rgba(255,130,230,.3); font-size:21px; line-height:1.7; }
+.letter.show{ display:block; animation:letterOpen 1s forwards; }
+@keyframes letterOpen{ from{ opacity:0; transform:translateY(30px) scale(.95); } to{ opacity:1; transform:none; } }
+.letter h2{ font-family:'Great Vibes',cursive; font-size:50px; text-align:center; margin-bottom:20px; }
+.finalTitle{ font-family:'Great Vibes',cursive; font-size:85px; color:#ffd6f7; text-shadow:0 0 20px #ff6ce3; }
+.finalText{ font-size:25px; max-width:700px; margin:25px auto; line-height:1.6; }
+.finalHeart{ font-size:65px; animation:heart 1.3s infinite; }
+
+@media(max-width:700px){
+    .passwordTitle{ font-size:55px; } .happyText{ font-size:62px; } .dearText{ font-size:48px; }
+    .question{ font-size:39px; } .answers{ grid-template-columns:1fr; } .photoBox{ height:430px; }
+}
+</style>
+</head>
+
+<body>
+
+<div id="background"></div>
+<canvas id="fireworksCanvas"></canvas>
+<div id="explosionFlash"></div>
+
+<button id="musicToggle" onclick="toggleMusic()">🎵 Music: Off</button>
+
+<audio id="romanticMusic" src="https://archive.org/download/AlsPlaylistMixedGenre/One%20Direction%20-%20Night%20Changes.mp3" preload="auto" loop crossorigin="anonymous"></audio>
+
+<section id="passwordScreen" class="screen">
+    <div>
+        <div class="passwordSmall">A little secret awaits</div>
+        <div class="passwordTitle">Your Birthday Surprise</div>
+        <input id="password" type="password" placeholder="Enter the password">
+        <br>
+        <button class="btn" onclick="enterPassword()">Enter ❤️</button>
+        <div id="error"></div>
+    </div>
+</section>
+
+<section id="audioGateScreen" class="screen hidden">
+    <div class="glass">
+        <div class="passwordTitle" style="font-size:60px;">Ready for your surprise?</div>
+        <p style="font-size:22px; margin:20px 0; color:#e0c2ff;">Tap below to unlock audio and start the magic ✨</p>
+        <button class="btn" onclick="startExperienceWithMusic()">Let's Go ❤️</button>
+    </div>
+</section>
+
+<section id="birthdayScreen" class="screen">
+    <div id="birthdayReveal" class="birthdayReveal">
+        <div class="happyText">Happy Birthday</div>
+        <div class="dearText">Dear Sushma ❤️</div>
+        <div class="heartBeat">✨ ❤️ ✨</div>
+        <button class="btn" onclick="startJourney()">I have more for you ✨</button>
+    </div>
+</section>
+
+<section id="chapterScreen" class="screen hidden">
+    <div class="glass">
+        <div class="chapterNumber">Chapter 01</div>
+        <div class="chapterTitle">Before anything else...</div>
+        <div class="chapterText">
+            Today is your day.
+            <br><br>
+            So I wanted to make something that wasn't just a normal birthday message.
+            <br><br>
+            Something you could open, explore, smile at, and remember.
+        </div>
+        <button class="btn" onclick="openMemories()">Continue ❤️</button>
+    </div>
+</section>
+
+<section id="memoryScreen" class="screen hidden">
+    <div class="glass memoryCard">
+        <div id="memoryIcon" class="memoryIcon">💬</div>
+        <div id="memoryTitle" class="memoryTitle">The Conversations</div>
+        <div id="memoryText" class="memoryText">Sometimes the most ordinary conversations become the ones you remember the most.</div>
+        <button class="btn" onclick="nextMemory()">Next memory ✨</button>
+    </div>
+</section>
+
+<section id="quizScreen" class="screen hidden">
+    <div class="glass">
+        <div class="quizCounter" id="quizCounter">QUESTION 1 / 4</div>
+        <div id="question" class="question"></div>
+        <div id="answers" class="answers"></div>
+        <div id="quizMessage" style="min-height:30px;margin-top:15px;font-size:20px;"></div>
+    </div>
+</section>
+
+<section id="cakeScreen" class="screen hidden">
+    <div class="glass">
+        <div class="chapterNumber">One more little thing...</div>
+        <div class="chapterTitle">Make a wish 🎂</div>
+        <div class="cake">
+            <div class="cakeBase"></div>
+            <div class="cakeCream"></div>
+            <div class="candle"><div class="flame"></div></div>
+            <div class="candle"><div class="flame"></div></div>
+            <div class="candle"><div class="flame"></div></div>
+        </div>
+        <div class="subtitle" style="margin-top:15px;">
+            Close your eyes for a second... make a wish...
+        </div>
+        <button class="btn" onclick="blowCandles()">Blow the candles 🎂</button>
+    </div>
+</section>
+
+<!-- PHOTO / SKETCH SCRATCH CARD -->
+<section id="photoScreen" class="screen hidden">
+    <div class="glass">
+        <div class="chapterNumber">A hand-made memory</div>
+        <div class="chapterTitle">Scratch to reveal your photo ❤</div>
+        <div class="photoBox">
+            <div class="photoContent">
+                <img id="sketchImg" src="sketch.jpg" alt="Handmade Sketch">
+            </div>
+            <canvas id="scratchCanvas"></canvas>
+        </div>
+        <div class="scratchHint" id="scratchHint">Rub the screen to reveal what's underneath ✨</div>
+        <button class="btn" id="sketchNextBtn" onclick="openLetter()" disabled>I found the memory 💌</button>
+    </div>
+</section>
+
+<section id="letterScreen" class="screen hidden">
+    <div>
+        <div id="envelope" class="envelope" onclick="openEnvelope()">💌</div>
+        <div id="letter" class="letter">
+            <h2>A little letter for you</h2>
+            <p>Happy Birthday ❤️</p>
+            <br>
+            <p>I don't know if a website can really express everything that a person wants to say, but I wanted to try.</p>
+            <br>
+            <p>You are one of those people whose presence can make an ordinary day feel a little more special.</p>
+            <br>
+            <p>I hope this year gives you countless reasons to smile, lots of happiness, and moments that you'll remember for a very long time.</p>
+            <br>
+            <p>And yes... this little surprise was made especially for you. ❤️</p>
+            <br>
+            <p style="text-align:right">— From someone who wanted your birthday to feel special</p>
+            <button class="btn" onclick="showFinal()">One last thing ✨</button>
+        </div>
+    </div>
+</section>
+
+<section id="finalScreen" class="screen hidden">
+    <div>
+        <div class="finalTitle">Happy Birthday ❤️</div>
+        <div class="finalText">
+            I hope you smiled at least a little while going through all of this.
+            <br><br>
+            Keep smiling. Keep being you. And have the most beautiful year ahead.
+        </div>
+        <div class="finalHeart">❤️️</div>
+        <button class="btn" onclick="location.reload()">Experience it again ✨</button>
+    </div>
+</section>
+
+<script>
+const background = document.getElementById("background");
+for(let i=0; i<180; i++){
+    const star = document.createElement("div");
+    star.className = "star";
+    star.style.left = Math.random()*100 + "%";
+    star.style.top = Math.random()*100 + "%";
+    star.style.animationDelay = Math.random()*4 + "s";
+    background.appendChild(star);
+}
+
+const romanticMusic = document.getElementById("romanticMusic");
+const musicToggleBtn = document.getElementById("musicToggle");
+
+function updateMusicButton(name, playing){
+    musicToggleBtn.textContent = playing ? `🎵 Playing: ${name}` : `🎵 Paused (${name})`;
+}
+
+let audioContext;
+function initAudio(){
+    if(!audioContext){
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if(audioContext.state === "suspended"){
+        audioContext.resume();
+    }
+}
+
+function startNightChanges(){
+    romanticMusic.volume = 0.8;
+    romanticMusic.currentTime = 0;
+    romanticMusic.play().then(()=>{
+        updateMusicButton("Night Changes", true);
+    }).catch(() => {
+        updateMusicButton("Night Changes (Tap)", false);
+    });
+}
+
+function toggleMusic(){
+    if(romanticMusic.paused){
+        romanticMusic.play();
+        updateMusicButton("Night Changes", true);
+    } else {
+        romanticMusic.pause();
+        updateMusicButton("Night Changes", false);
+    }
+}
+
+function rocketSound(){
+    initAudio();
+    const now = audioContext.currentTime;
+    const osc = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+    osc.type = "sawtooth";
+    osc.frequency.setValueAtTime(130, now);
+    osc.frequency.exponentialRampToValueAtTime(1200, now + 1.25);
+    gain.gain.setValueAtTime(.0001, now);
+    gain.gain.exponentialRampToValueAtTime(.32, now + .18);
+    gain.gain.exponentialRampToValueAtTime(.0001, now + 1.3);
+    osc.connect(gain);
+    gain.connect(audioContext.destination);
+    osc.start(now);
+    osc.stop(now + 1.35);
+}
+
+function blastSound(){
+    initAudio();
+    const now = audioContext.currentTime;
+    const buffer = audioContext.createBuffer(1, audioContext.sampleRate * .8, audioContext.sampleRate);
+    const data = buffer.getChannelData(0);
+    for(let i=0; i<data.length; i++){
+        data[i] = (Math.random()*2 - 1) * Math.pow(1 - i/data.length, 1.7);
+    }
+    const noise = audioContext.createBufferSource();
+    noise.buffer = buffer;
+    const noiseGain = audioContext.createGain();
+    noiseGain.gain.setValueAtTime(.9, now);
+    noiseGain.gain.exponentialRampToValueAtTime(.001, now + .75);
+    noise.connect(noiseGain);
+    noiseGain.connect(audioContext.destination);
+    noise.start(now);
+
+    const boom = audioContext.createOscillator();
+    const boomGain = audioContext.createGain();
+    boom.type = "sine";
+    boom.frequency.setValueAtTime(75, now);
+    boom.frequency.exponentialRampToValueAtTime(28, now + 1.1);
+    boomGain.gain.setValueAtTime(.95, now);
+    boomGain.gain.exponentialRampToValueAtTime(.001, now + 1.2);
+    boom.connect(boomGain);
+    boomGain.connect(audioContext.destination);
+    boom.start(now);
+    boom.stop(now + 1.25);
+}
+
+function correctSound(){
+    initAudio();
+    const notes = [659.25, 783.99, 1046.50];
+    notes.forEach((freq, index) => {
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        const start = audioContext.currentTime + index * .09;
+        osc.type = "triangle";
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(.0001, start);
+        gain.gain.exponentialRampToValueAtTime(.18, start + .025);
+        gain.gain.exponentialRampToValueAtTime(.0001, start + .42);
+        osc.connect(gain);
+        gain.connect(audioContext.destination);
+        osc.start(start);
+        osc.stop(start + .45);
+    });
+}
+
+function wrongSound(){
+    initAudio();
+    const now = audioContext.currentTime;
+    const osc = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+    osc.type = "square";
+    osc.frequency.setValueAtTime(230, now);
+    osc.frequency.exponentialRampToValueAtTime(110, now + .28);
+    gain.gain.setValueAtTime(.22, now);
+    gain.gain.exponentialRampToValueAtTime(.001, now + .3);
+    osc.connect(gain);
+    gain.connect(audioContext.destination);
+    osc.start(now);
+    osc.stop(now + .32);
+}
+
+function enterPassword(){
+    const val = document.getElementById("password").value;
+    const error = document.getElementById("error");
+    if(val !== "2006"){
+        error.textContent = "Hmm... that's not it 😏";
+        wrongSound();
+        return;
+    }
+    initAudio();
+    document.getElementById("passwordScreen").classList.add("hidden");
+    setTimeout(()=>{
+        document.getElementById("audioGateScreen").classList.remove("hidden");
+    }, 700);
+}
+
+document.getElementById("password").addEventListener("keydown", function(e){
+    if(e.key === "Enter") enterPassword();
+});
+
+function startExperienceWithMusic(){
+    hide("audioGateScreen");
+    setTimeout(()=>{
+        document.getElementById("birthdayScreen").classList.add("active");
+        startBirthdayShow();
+    }, 300);
+}
+
+const canvas = document.getElementById("fireworksCanvas");
+const ctx = canvas.getContext("2d");
+function resize(){
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener("resize", resize);
+
+let particles = [];
+
+function createMassiveFirework(x, y){
+    const colors = ["#ff3cac", "#ff72e8", "#ffd000", "#00eaff", "#9d4edd", "#ffffff", "#ff7043", "#6eff8a", "#ff4f81"];
+    for(let i=0; i<360; i++){
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 15 + 3;
+        particles.push({
+            x: x, y: y,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            life: Math.random() * 90 + 100,
+            maxLife: 190,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            size: Math.random() * 4 + 1
+        });
+    }
+}
+
+function createPartyPopper(x, y){
+    const colors = ["#ff3cac", "#ffd000", "#00eaff", "#ffffff", "#ff7043", "#6eff8a", "#ff4f81"];
+    for(let i=0; i<120; i++){
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 12 + 2;
+        particles.push({
+            x: x, y: y,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed - 2,
+            life: Math.random() * 50 + 60,
+            maxLife: 110,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            size: Math.random() * 5 + 2
+        });
+    }
+}
+
+function createRays(x, y){
+    const colors = ["#ff3cac", "#ffd000", "#00eaff", "#ffffff", "#9d4edd"];
+    for(let i=0; i<100; i++){
+        const angle = (Math.PI * 2 / 100) * i;
+        const speed = Math.random() * 10 + 7;
+        particles.push({
+            x: x, y: y,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            life: Math.random() * 80 + 80,
+            maxLife: 160,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            size: Math.random() * 3 + 1
+        });
+    }
+}
+
+function animate(){
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for(let i = particles.length - 1; i >= 0; i--){
+        const p = particles[i];
+        p.x += p.vx; p.y += p.vy;
+        p.vx *= .985; p.vy *= .985; p.vy += .055;
+        p.life--;
+        ctx.globalAlpha = Math.max(0, p.life / p.maxLife);
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+        if(p.life <= 0) particles.splice(i, 1);
+    }
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(animate);
+}
+animate();
+
+function launchRocket(){
+    const rocket = document.createElement("div");
+    rocket.className = "rocket";
+    document.getElementById("birthdayScreen").appendChild(rocket);
+    rocketSound();
+    rocket.style.animation = "rocketUp 1.5s cubic-bezier(.2,.8,.2,1) forwards";
+    setTimeout(()=>{
+        const x = window.innerWidth / 2;
+        const y = window.innerHeight * .25;
+        rocket.remove();
+        createMassiveFirework(x, y);
+        createRays(x, y);
+        blastSound();
+        const flash = document.getElementById("explosionFlash");
+        flash.classList.remove("flash");
+        void flash.offsetWidth;
+        flash.classList.add("flash");
+
+        startNightChanges();
+    }, 1450);
+}
+
+function startBirthdayShow(){
+    setTimeout(() => { launchRocket(); }, 500);
+    setTimeout(() => {
+        document.getElementById("birthdayReveal").classList.add("show");
+    }, 3000);
+}
+
+function hide(id){ document.getElementById(id).classList.add("hidden"); }
+function show(id){ document.getElementById(id).classList.remove("hidden"); }
+
+function startJourney(){
+    hide("birthdayScreen");
+    setTimeout(() => { show("chapterScreen"); }, 700);
+}
+
+function openMemories(){
+    hide("chapterScreen");
+    setTimeout(() => { show("memoryScreen"); }, 700);
+}
+
+const memories = [
+    { icon: "💬", title: "The Conversations", text: "Sometimes the most ordinary conversations become the ones you remember the most." },
+    { icon: "😂", title: "The Random Moments", text: "The random jokes, the little silly arguments, and moments that made no sense but made total sense to us." },
+    { icon: "✨", title: "Just Being You", text: "Thank you for being someone so genuine, kind, and genuinely wonderful to be around." }
+];
+let currentMemory = 0;
+
+function nextMemory(){
+    currentMemory++;
+    if(currentMemory < memories.length){
+        document.getElementById("memoryIcon").textContent = memories[currentMemory].icon;
+        document.getElementById("memoryTitle").textContent = memories[currentMemory].title;
+        document.getElementById("memoryText").textContent = memories[currentMemory].text;
+    } else {
+        hide("memoryScreen");
+        setTimeout(() => { startQuiz(); }, 700);
+    }
+}
+
+const quizData = [
+    {
+        q: "woh kon sa word h jo aapko mere saath baat krne waqth use krne mebhot maza aata h",
+        answers: ["pta nhi", "Hnn / Achha", "Pagal", "Kuchh nahi"],
+        correct: 0
+    },
+    {
+        q: "aapko mere se baat krte waqth kya hai jo bhot jor se aati h",
+        answers: ["Hasi / Gussa", "Need (Nind) 😴", "Pyar", "Sir dard"],
+        correct: 1
+    },
+    {
+        q: "aap mere uper kitna bharosha krte ho",
+        answers: ["50%", "100% ❤️", "10%", "Zero %"],
+        correct: 1
+    },
+    {
+        q: "Subah uthte hi sabse pehle kiska khayal aata hai?",
+        answers: ["Mere khayal 😏", "Chai / Coffee ☕", "Mobile Notification 📱", "Sone ka firse 😴"],
+        correct: 0
+    }
+];
+
+let currentQuestion = 0;
+
+function startQuiz(){
+    show("quizScreen");
+    loadQuestion();
+}
+
+function loadQuestion(){
+    const q = quizData[currentQuestion];
+    document.getElementById("quizCounter").textContent = `QUESTION ${currentQuestion + 1} / ${quizData.length}`;
+    document.getElementById("question").textContent = q.q;
+    document.getElementById("quizMessage").textContent = "";
+    
+    const container = document.getElementById("answers");
+    container.innerHTML = "";
+    
+    q.answers.forEach((ans, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "answer";
+        btn.textContent = ans;
+        btn.onclick = (e) => handleAnswer(idx, e);
+        container.appendChild(btn);
+    });
+}
+
+function handleAnswer(idx, e){
+    const q = quizData[currentQuestion];
+    const btns = document.querySelectorAll(".answer");
+    const msg = document.getElementById("quizMessage");
+    
+    if(idx === q.correct){
+        correctSound();
+        btns[idx].classList.add("correct");
+        msg.style.color = "#5cffb0";
+        msg.textContent = "Correct! ✨ ❤️";
+
+        const rect = e.target.getBoundingClientRect();
+        createPartyPopper(rect.left + rect.width / 2, rect.top + rect.height / 2);
+
+        setTimeout(() => {
+            currentQuestion++;
+            if(currentQuestion < quizData.length){
+                loadQuestion();
+            } else {
+                hide("quizScreen");
+                setTimeout(() => { show("cakeScreen"); }, 700);
+            }
+        }, 1400);
+    } else {
+        wrongSound();
+        btns[idx].classList.add("wrong");
+        msg.style.color = "#ff7194";
+        msg.textContent = "Oops! Try again 😏";
+        setTimeout(() => {
+            btns[idx].classList.remove("wrong");
+        }, 1000);
+    }
+}
+
+function blowCandles(){
+    const flames = document.querySelectorAll(".flame");
+    flames.forEach(f => f.style.display = "none");
+
+    setTimeout(() => {
+        hide("cakeScreen");
+        setTimeout(() => {
+            show("photoScreen");
+            initScratchCard();
+        }, 700);
+    }, 1000);
+}
+
+function initScratchCard(){
+    const sCanvas = document.getElementById("scratchCanvas");
+    const sCtx = sCanvas.getContext("2d");
+    const box = sCanvas.parentElement;
+    
+    sCanvas.width = box.clientWidth;
+    sCanvas.height = box.clientHeight;
+    
+    const scratchImage = new Image();
+    scratchImage.crossOrigin = "anonymous";
+    scratchImage.src = "photo2.jpg";
+    scratchImage.onload = function() {
+        sCtx.drawImage(scratchImage, 0, 0, sCanvas.width, sCanvas.height);
+    };
+    scratchImage.onerror = function() {
+        sCtx.fillStyle = "#2a1b3d";
+        sCtx.fillRect(0, 0, sCanvas.width, sCanvas.height);
+        sCtx.font = "24px 'Cormorant Garamond'";
+        sCtx.fillStyle = "#e0b0ff";
+        sCtx.textAlign = "center";
+        sCtx.fillText("Scratch here to reveal!", sCanvas.width/2, sCanvas.height/2);
+    };
+
+    let isDrawing = false;
+
+    function scratch(e){
+        if(!isDrawing) return;
+        if(e.cancelable) e.preventDefault();
+
+        const rect = sCanvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        const x = clientX - rect.left;
+        const y = clientY - rect.top;
+
+        sCtx.globalCompositeOperation = "destination-out";
+        sCtx.beginPath();
+        sCtx.arc(x, y, 30, 0, Math.PI * 2);
+        sCtx.fill();
+        checkScratchPercentage();
+    }
+
+    function checkScratchPercentage(){
+        try {
+            const imgData = sCtx.getImageData(0, 0, sCanvas.width, sCanvas.height);
+            let cleared = 0;
+            for(let i = 3; i < imgData.data.length; i += 16){
+                if(imgData.data[i] === 0) cleared++;
+            }
+            const pct = (cleared / (imgData.data.length / 16)) * 100;
+            if(pct > 40){
+                document.getElementById("sketchNextBtn").disabled = false;
+                document.getElementById("scratchHint").textContent = "Memory revealed! Click below to continue ❤️";
+            }
+        } catch(err) {
+            document.getElementById("sketchNextBtn").disabled = false;
+        }
+    }
+
+    sCanvas.addEventListener("mousedown", () => isDrawing = true);
+    sCanvas.addEventListener("mouseup", () => isDrawing = false);
+    sCanvas.addEventListener("mousemove", scratch);
+
+    sCanvas.addEventListener("touchstart", (e) => { isDrawing = true; scratch(e); }, { passive: false });
+    sCanvas.addEventListener("touchend", () => isDrawing = false);
+    sCanvas.addEventListener("touchmove", scratch, { passive: false });
+}
+
+function openLetter(){
+    hide("photoScreen");
+    setTimeout(() => { show("letterScreen"); }, 700);
+}
+
+function openEnvelope(){
+    document.getElementById("envelope").style.display = "none";
+    document.getElementById("letter").classList.add("show");
+}
+
+function showFinal(){
+    hide("letterScreen");
+    setTimeout(() => { show("finalScreen"); }, 700);
+}
+</script>
+</body>
+</html>
